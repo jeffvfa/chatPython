@@ -1,7 +1,7 @@
 import socket
 import thread
 
-HOST = '172.17.32.193'      # Endereco IP do Servidor
+HOST = '172.17.32.193'     
 PORT = 12001  
 
 def conectado(con, cliente):
@@ -10,7 +10,9 @@ def conectado(con, cliente):
     while True:
         msg = con.recv(1024)
         if not msg: break
-        print cliente, msg
+        con.send(msg.upper())
+        print cliente, msg 
+        
 
     print 'Finalizando conexao do cliente', cliente
     con.close()
