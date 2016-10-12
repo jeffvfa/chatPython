@@ -27,12 +27,17 @@ def conectado(con, cliente):
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 tcp.bind(orig)
-tcp.listen(1)
 
 motd = open('file/MOTD.txt','r')
 
-while True:
-    con, cliente = tcp.accept()
-    thread.start_new_thread(conectado, tuple([con, cliente]))
+def main():
+    tcp.listen(1)
 
-tcp.close()
+    while True:
+        con, cliente = tcp.accept()
+        thread.start_new_thread(conectado, tuple([con, cliente]))
+
+    tcp.close()
+
+if __name__ == "__main__":
+    main()
