@@ -10,10 +10,76 @@ PORT = 12001        # Porta que o Servidor esta
 #tupla do destino
 orig = (HOST, PORT)
 
-def parse(mensagem):
-    print mensagem
-    print mensagem
-    print mensagem
+def parse(mensagem, con):
+    mensagem = mensagem.split(' ', 1)
+
+    if mensagem[0] == '/quit':
+        print 'comando /quit'
+        return
+
+    elif mensagem[0] == '/help':
+        print 'comando /help'
+        return
+
+    elif mensagem[0] == '/nick':
+        print 'comando /nick'
+        return
+
+    elif mensagem[0] == '/leave':
+        print 'comando /leave'
+        return
+
+    elif mensagem[0] == '/list':
+        print 'comando /list'
+        return
+
+    elif mensagem[0] == '/join':
+        print 'comando /join'
+        return
+
+    elif mensagem[0] == '/create':
+        print 'comando /create'
+        return
+
+    elif mensagem[0] == '/delete':
+        print 'comando /delete'
+        return
+
+    elif mensagem[0] == '/away':
+        print 'comando /away'
+        return
+
+    elif mensagem[0] == '/msg':
+        print 'comando /msg'
+        return
+
+    elif mensagem[0] == '/ban':
+        print 'comando /ban'
+        return
+
+    elif mensagem[0] == '/kick':
+        print 'comando /kick'
+        return
+
+    elif mensagem[0] == '/clear':
+        print 'comando /clear'
+        return
+
+    elif mensagem[0] == '/file':
+        print 'comando /file'
+        return
+
+
+    elif mensagem[0] == '/list_files':
+        print 'comando /list_files'
+        return
+
+    elif mensagem[0] == '/get_file':
+        print 'comando /get_file'
+        return
+
+    else:
+        print "NENHUM COMANDO"
 
 def conectado(con, cliente):
     print 'Conectado por', cliente
@@ -22,8 +88,8 @@ def conectado(con, cliente):
 
     while True:
         msg = con.recv(1024)
-        if not msg: break
-        parse(msg)
+
+        parse(msg,con)
         con.send(msg.upper())
         print cliente, msg
 
