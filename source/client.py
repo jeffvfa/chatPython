@@ -1,15 +1,16 @@
 import socket
-HOST = '172.17.35.206'      # Endereco IP do Servidor
+HOST = '192.168.1.107'      # Endereco IP do Servidor
 PORT = 12001        # Porta que o Servidor esta
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 dest = (HOST, PORT)
 tcp.connect(dest)
-print 'Para sair use CTRL+X\n'
-msg = raw_input()
-while msg <> '\x18':
+print 'Para sair digite /quit'
+
+while 1:
+    msg = raw_input()
+    if msg == '/quit':
+        tcp.close()
+        break
     tcp.send (msg)
-    msg = raw_input() 
-    recebido = tcp.recv(1024) 
+    recebido = tcp.recv(1024)
     print recebido
-    
-tcp.close()
