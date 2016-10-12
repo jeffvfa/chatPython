@@ -11,6 +11,7 @@ PORT = 12001        # Porta que o Servidor esta
 orig = (HOST, PORT)
 
 def parser(mensagem, con):
+    msg = mensagem
     mensagem = mensagem.split(' ', 1)
 
     if mensagem[0] == '/quit':
@@ -77,9 +78,9 @@ def parser(mensagem, con):
     elif mensagem[0] == '/get_file':
         print 'comando /get_file'
         return
-
     else:
-        print "NENHUM COMANDO"
+        print "nenhum comando"
+        
 
 def conectado(con, cliente):
     print 'Conectado por', cliente
@@ -89,9 +90,12 @@ def conectado(con, cliente):
     while True:
         msg = con.recv(1024)
 
-        parser(msg,con)
-        con.send(msg.upper())
-        print cliente, msg
+        if msg <> '':
+            print cliente, msg
+            parser(msg,con)
+            con.send(msg.upper())
+
+
 
 
     print 'Finalizando conexao do cliente', cliente
