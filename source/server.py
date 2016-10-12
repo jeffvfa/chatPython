@@ -10,7 +10,7 @@ PORT = 12001        # Porta que o Servidor esta
 #tupla do destino
 orig = (HOST, PORT)
 
-def parse(mensagem, con):
+def parser(mensagem, con):
     mensagem = mensagem.split(' ', 1)
 
     if mensagem[0] == '/quit':
@@ -89,7 +89,7 @@ def conectado(con, cliente):
     while True:
         msg = con.recv(1024)
 
-        parse(msg,con)
+        parser(msg,con)
         con.send(msg.upper())
         print cliente, msg
 
