@@ -1,11 +1,17 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import socket
 import thread
 
-HOST = '192.168.1.107'     
+HOST = '192.168.1.107'
 PORT = 12001
+orig = (HOST, PORT)
 
 def conectado(con, cliente):
     print 'Conectado por', cliente
+
+    for line in motd:
+        con.send(line)
 
     while True:
         msg = con.recv(1024)
@@ -20,10 +26,10 @@ def conectado(con, cliente):
 
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-orig = (HOST, PORT)
-
 tcp.bind(orig)
 tcp.listen(1)
+
+motd = open('file/MOTD.txt','r')
 
 while True:
     con, cliente = tcp.accept()

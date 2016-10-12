@@ -1,16 +1,28 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import socket
+
 HOST = '192.168.1.107'      # Endereco IP do Servidor
 PORT = 12001        # Porta que o Servidor esta
+
+#cria o socket
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#tupla do destino
 dest = (HOST, PORT)
+#cria a conexão
 tcp.connect(dest)
-print 'Para sair digite /quit'
 
 while 1:
+    #recebe a resposta do Servidor
+    recebido = tcp.recv(1024)
+    print recebido
+
+    #pega a mensagem do usuário
     msg = raw_input()
+
+    #se o usuário quiser sair sai
     if msg == '/quit':
         tcp.close()
         break
+    #envia a mensagem
     tcp.send (msg)
-    recebido = tcp.recv(1024)
-    print recebido
