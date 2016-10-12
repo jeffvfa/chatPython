@@ -10,8 +10,10 @@ PORT = 12001        # Porta que o Servidor esta
 #tupla do destino
 orig = (HOST, PORT)
 
-def parse():
-    break
+def parse(mensagem):
+    print mensagem
+    print mensagem
+    print mensagem
 
 def conectado(con, cliente):
     print 'Conectado por', cliente
@@ -21,6 +23,7 @@ def conectado(con, cliente):
     while True:
         msg = con.recv(1024)
         if not msg: break
+        parse(msg)
         con.send(msg.upper())
         print cliente, msg
 
@@ -35,7 +38,7 @@ tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 tcp.bind(orig)
 
 #carrega a Message of the day
-motd = open('file/MOTD.txt','r')
+motd = open('../file/MOTD.txt','r')
 
 #funçãao main
 def main():
