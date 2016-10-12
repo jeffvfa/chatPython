@@ -1,7 +1,7 @@
 import socket
 import thread
 
-HOST = '172.17.35.203'     
+HOST = '172.17.35.206'     
 PORT = 12001  
 
 def conectado(con, cliente):
