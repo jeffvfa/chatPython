@@ -6,12 +6,17 @@ import thread
 
 #HOST = '192.168.1.107' # Endereco IP do Servidor - meu pc 
 HOST = '172.17.40.173'  # Endereco IP do Servidor
-PORT = 12003        # Porta que o Servidor esta
+PORT = 12005        # Porta que o Servidor esta
 
 #tupla do destino
 orig = (HOST, PORT)
 
-def parser(mensagem, con):
+
+def solicita(con, msg): 
+    con.send(msg) 
+    return con.recv(1024)
+
+def parser(mensagem, con, cliente, nick):
     msg = mensagem
     mensagem = mensagem.split(' ', 1)
 
@@ -24,7 +29,9 @@ def parser(mensagem, con):
         return
 
     elif mensagem[0] == '/nick':
-        print 'comando /nick'
+        print 'comando /nick'  
+        novo_nick = mensagem[1]
+        atualizaNick(cliente, nick, novo_nick)
         return
 
     elif mensagem[0] == '/leave':
@@ -92,13 +99,15 @@ def conectado(con, cliente):
         con.send(line)
 
     while True:
+        nick = buscaNick(cliente,con)
         msg = con.recv(1024)
 
         if msg <> '':
             print nick, cliente, msg
-            parser(msg,con)
+            parser(msg, con , cliente, nick)
             con.send(msg.upper())
-
+        
+        
 
 
 
@@ -114,12 +123,9 @@ def buscaNick(cliente,con):
             database = line.split('%') 
     
         base.close()
-        print 'aquifora'
         for par in database: 
-            print 'aquidentro'
             verifica = par.split('=') 
-            print verifica[0] 
-            print str(cliente)
+            
             if verifica[0] == str(cliente): 
                 return verifica[1] 
         criarNick(cliente,con)
@@ -127,14 +133,30 @@ def buscaNick(cliente,con):
 
 def criarNick(cliente,con): 
     database = open('../file/users.txt','a') 
-    con.send('informe o seu nick:') 
-    nick = con.recv(1024)
+    nick = solicita(con,'informe o seu nick:') 
     registro = str(cliente)+'='+str(nick)+'%'  
-    print registro
+
     database.write(registro)  
     database.close() 
     
-    print 'gravou'
+    return
+
+def atualizaNick(cliente, nick, novo_nick): 
+    database = open('../file/users.txt','r') 
+    antigo = str(cliente)+'='+str(nick)+'%'
+    novo = registro = str(cliente)+'='+str(novo_nick)+'%'
+    
+    database_novo = ''
+    
+    for line in database:
+        database_novo = str(line).replace(antigo,novo)
+    
+    database.close() 
+    
+    database = open('../file/users.txt','w') 
+    database.write(database_novo)
+    database.close() 
+
     return
 
 #cria o socket
