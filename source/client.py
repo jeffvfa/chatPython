@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 import socket
 
-HOST = '192.168.1.107'      # Endereco IP do Servidor
+#HOST = '192.168.1.107'      # Endereco IP do Servidor
+HOST = '172.17.40.97'
 PORT = 12001        # Porta que o Servidor esta
 
 #cria o socket
