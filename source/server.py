@@ -9,28 +9,46 @@ HOST = '172.17.40.173'  # Endereco IP do Servidor
 PORT = 12005        # Porta que o Servidor esta
 
 #tupla do destino
-orig = (HOST, PORT)
+orig = (HOST, PORT) 
+
+#cria o socket
+tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#configura o servidor pra conectar com clientes
+tcp.bind(orig)
+
+
 
 
 def solicita(con, msg): 
     con.send(msg) 
     return con.recv(1024)
 
+def enviaMotd(con): 
+    #carrega a Message of the day
+    motd = open('../file/MOTD.txt','r')
+    
+    for line in motd: 
+        print line
+        con.send(line) 
+    
+    motd.close()
+    return
+
 def parser(mensagem, con, cliente, nick):
     msg = mensagem
     mensagem = mensagem.split(' ', 1)
 
     if mensagem[0] == '/quit':
-        print 'comando /quit'
+        fecharConexao(con, cliente) 
         return
 
-    elif mensagem[0] == '/help':
-        print 'comando /help'
+    elif mensagem[0] == '/help': 
+        print "HELP ME PLIX"
+        enviaMotd(con)
         return
 
     elif mensagem[0] == '/nick':
-        print 'comando /nick'  
-        novo_nick = mensagem[1]
+        novo_nick = str(mensagem[1]).strip()
         atualizaNick(cliente, nick, novo_nick)
         return
 
@@ -90,29 +108,31 @@ def parser(mensagem, con, cliente, nick):
         print "nenhum comando"
         
 
+def fecharConexao(con, cliente): 
+    print 'Finalizando conexao do cliente', cliente
+    con.close() 
+    return
+
+
 def conectado(con, cliente):
     print 'Conectado por', cliente
     
     nick = buscaNick(cliente,con)
     
-    for line in motd:
-        con.send(line)
+    enviaMotd(con)
 
-    while True:
+    while 1:
         nick = buscaNick(cliente,con)
         msg = con.recv(1024)
 
-        if msg <> '':
+        if msg != '':
             print nick, cliente, msg
             parser(msg, con , cliente, nick)
             con.send(msg.upper())
         
-        
+    
 
-
-
-    print 'Finalizando conexao do cliente', cliente
-    con.close()
+    fecharConexao(con, cliente)
     thread.exit()
 
 def buscaNick(cliente,con): 
@@ -159,13 +179,7 @@ def atualizaNick(cliente, nick, novo_nick):
 
     return
 
-#cria o socket
-tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#configura o servidor pra conectar com clientes
-tcp.bind(orig)
 
-#carrega a Message of the day
-motd = open('../file/MOTD.txt','r')
 
 #funçãao main
 def main():

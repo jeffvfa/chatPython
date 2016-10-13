@@ -23,7 +23,7 @@ while 1:
 
     #se o usuário quiser sair sai
     if msg == '/quit':
-        tcp.close()
-        break
+       tcp.close()
+       break
     #envia a mensagem
     tcp.send (msg)
