@@ -4,9 +4,9 @@
 import socket
 import thread
 
-#HOST = '192.168.1.107' # Endereco IP do Servidor
-HOST = '172.17.40.97'
-PORT = 12001        # Porta que o Servidor esta
+#HOST = '192.168.1.107' # Endereco IP do Servidor - meu pc 
+HOST = '172.17.40.173'  # Endereco IP do Servidor
+PORT = 12003        # Porta que o Servidor esta
 
 #tupla do destino
 orig = (HOST, PORT)
@@ -85,6 +85,9 @@ def parser(mensagem, con):
 
 def conectado(con, cliente):
     print 'Conectado por', cliente
+    
+    nick = buscaNick(cliente,con)
+    
     for line in motd:
         con.send(line)
 
@@ -92,7 +95,7 @@ def conectado(con, cliente):
         msg = con.recv(1024)
 
         if msg <> '':
-            print cliente, msg
+            print nick, cliente, msg
             parser(msg,con)
             con.send(msg.upper())
 
@@ -102,6 +105,37 @@ def conectado(con, cliente):
     print 'Finalizando conexao do cliente', cliente
     con.close()
     thread.exit()
+
+def buscaNick(cliente,con): 
+    while 1:
+        base = open('../file/users.txt','r') 
+        database = ''
+        for line in base:
+            database = line.split('%') 
+    
+        base.close()
+        print 'aquifora'
+        for par in database: 
+            print 'aquidentro'
+            verifica = par.split('=') 
+            print verifica[0] 
+            print str(cliente)
+            if verifica[0] == str(cliente): 
+                return verifica[1] 
+        criarNick(cliente,con)
+            
+
+def criarNick(cliente,con): 
+    database = open('../file/users.txt','a') 
+    con.send('informe o seu nick:') 
+    nick = con.recv(1024)
+    registro = str(cliente)+'='+str(nick)+'%'  
+    print registro
+    database.write(registro)  
+    database.close() 
+    
+    print 'gravou'
+    return
 
 #cria o socket
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -115,7 +149,7 @@ motd = open('../file/MOTD.txt','r')
 def main():
     #coloca o servidor para "escutar"
     tcp.listen(1)
-
+    
     while True:
         #aceita a conexao do cliente
         con, cliente = tcp.accept()
