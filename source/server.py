@@ -4,48 +4,31 @@
 import socket
 import thread
 
-#HOST = '172.17.35.206'     
+#HOST = '192.168.1.107' # Endereco IP do Servidor
 HOST = '172.17.40.97'
-PORT = 12001  
+PORT = 12001        # Porta que o Servidor esta
 
-def conectado(con, cliente):
-    print 'Conectado por', cliente
+#tupla do destino
+orig = (HOST, PORT)
 
-    while True:
-        msg = con.recv(1024)
+def parser(mensagem, con):
+    msg = mensagem
+    mensagem = mensagem.split(' ', 1)
 
-        if msg <> '':
-            print cliente, msg
-            parser(msg,con)
-            con.send(msg.upper())
+    if mensagem[0] == '/quit':
+        print 'comando /quit'
+        return
 
+    elif mensagem[0] == '/help':
+        print 'comando /help'
+        return
 
+    elif mensagem[0] == '/nick':
+        print 'comando /nick'
+        return
 
-
-    print 'Finalizando conexao do cliente', cliente
-    con.close()
-    thread.exit()
-
-#cria o socket
-tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#configura o servidor pra conectar com clientes
-tcp.bind(orig)
-
-#carrega a Message of the day
-motd = open('../file/MOTD.txt','r')
-
-#funçãao main
-def main():
-    #coloca o servidor para "escutar"
-    tcp.listen(1)
-
-    while True:
-        #aceita a conexao do cliente
-        con, cliente = tcp.accept()
-        #cria uma nova thread para cada conexão
-        thread.start_new_thread(conectado, tuple([con, cliente]))
-
-<<<<<<<<< saved version
+    elif mensagem[0] == '/leave':
+        print 'comando /leave'
         return
 
     elif mensagem[0] == '/list':
@@ -140,32 +123,6 @@ def main():
         thread.start_new_thread(conectado, tuple([con, cliente]))
 
     tcp.close()
-=========
-
-while True:
-    con, cliente = tcp.accept()
-    thread.start_new_thread(conectado, tuple([con, cliente]))
->>>>>>>>> local version
-
-<<<<<<<<< saved version
-#carrega a Message of the day
-motd = open('../file/MOTD.txt','r')
-
-#funçãao main
-def main():
-    #coloca o servidor para "escutar"
-    tcp.listen(1)
-
-    while True:
-        #aceita a conexao do cliente
-        con, cliente = tcp.accept()
-        #cria uma nova thread para cada conexão
-        thread.start_new_thread(conectado, tuple([con, cliente]))
-
-    tcp.close()
 
 if __name__ == "__main__":
     main()
-=========
-
->>>>>>>>> local version
