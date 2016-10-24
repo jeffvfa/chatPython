@@ -5,7 +5,7 @@ import socket
 import thread
 
 #HOST = '192.168.1.107' # Endereco IP do Servidor - meu pc 
-HOST = '172.17.40.173'  # Endereco IP do Servidor
+HOST = '172.17.11.47'  # Endereco IP do Servidor
 PORT = 12005        # Porta que o Servidor esta
 
 #tupla do destino
@@ -16,7 +16,8 @@ tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 #configura o servidor pra conectar com clientes
 tcp.bind(orig)
 
-
+#lista de grupos 
+grupos = [] 
 
 
 def solicita(con, msg): 
@@ -32,6 +33,41 @@ def enviaMotd(con):
         con.send(line) 
     
     motd.close()
+    return 
+
+def criarGrupo(con,nome_grupo, nick): 
+    #legenda dos códigos
+    #2 é nome do grupo  
+    #1 é admin 
+    #0 é usuário normal 
+    
+    nome_novo_grupo = (nome_grupo,2)
+    
+    
+    for i in grupos:  
+        
+        if (nome_novo_grupo in i): 
+            con.send('grupo já existe') 
+            return
+        
+    novo_grupo = []
+    novo_grupo.append(nome_novo_grupo) 
+    novo_grupo.append((nick,1))  
+    
+    grupos.append(novo_grupo)
+    
+    con.send('grupo criado')  
+    
+    return 
+
+def listarGrupos(con): 
+    lista = []
+    for i in grupos:  
+        if (i[1] == 2): 
+            lista.append(i[0]) 
+            continue
+    
+    con.send(str(lista)) 
     return
 
 def parser(mensagem, con, cliente, nick):
@@ -57,6 +93,7 @@ def parser(mensagem, con, cliente, nick):
         return
 
     elif mensagem[0] == '/list':
+        listarGrupos(con)
         print 'comando /list'
         return
 
@@ -64,7 +101,8 @@ def parser(mensagem, con, cliente, nick):
         print 'comando /join'
         return
 
-    elif mensagem[0] == '/create':
+    elif mensagem[0] == '/create': 
+        criarGrupo(con,mensagem[1],nick)
         print 'comando /create'
         return
 
@@ -184,7 +222,9 @@ def atualizaNick(cliente, nick, novo_nick):
 #funçãao main
 def main():
     #coloca o servidor para "escutar"
-    tcp.listen(1)
+    tcp.listen(1) 
+    
+    
     
     while True:
         #aceita a conexao do cliente
