@@ -5,8 +5,8 @@ import socket
 import thread
 
 #HOST = '192.168.1.107' # Endereco IP do Servidor - meu pc 
-HOST = '172.17.11.47'  # Endereco IP do Servidor
-PORT = 12005        # Porta que o Servidor esta
+HOST = '172.17.15.11'  # Endereco IP do Servidor
+PORT = 12238        # Porta que o Servidor esta
 
 #tupla do destino
 orig = (HOST, PORT) 
@@ -18,6 +18,30 @@ tcp.bind(orig)
 
 #lista de grupos 
 grupos = [] 
+
+def jaEstaEmgrupo(nick): 
+    
+    for i in grupos: 
+        for j in i: 
+            if ((j[1] == 0 or j[1] == 1) and j[0] == nick ): 
+                return True 
+    return False
+
+def juntarSeAGrupo(con,nome_grupo, nick):  
+    tchuco = jaEstaEmgrupo(nick)
+    if(tchuco): 
+        con.send('não pode estar em dois grupos diferentes') 
+        return 
+    else:
+        for i in grupos: 
+            for j in i: 
+                if (j[1] == 2 and j[0] == nome_grupo): 
+                    i.append((nick,0))
+                    con.send('incluido no grupo') 
+                    return
+    
+    con.send('grupo não encontrado') 
+    return
 
 
 def solicita(con, msg): 
@@ -61,11 +85,18 @@ def criarGrupo(con,nome_grupo, nick):
     return 
 
 def listarGrupos(con): 
-    lista = []
-    for i in grupos:  
-        if (i[1] == 2): 
-            lista.append(i[0]) 
-            continue
+    lista = [] 
+    
+    for i in grupos: 
+        
+        for j in i: 
+             
+            if (j[1] == 2): 
+                lista.append(j[0]) 
+                break
+            else: 
+                continue
+        
     
     con.send(str(lista)) 
     return
@@ -98,6 +129,7 @@ def parser(mensagem, con, cliente, nick):
         return
 
     elif mensagem[0] == '/join':
+        juntarSeAGrupo(con,mensagem[1], nick)
         print 'comando /join'
         return
 
