@@ -80,13 +80,14 @@ def criarGrupo(con,nome_grupo, nick):
     #tupla de identificação do grupo
     nome_novo_grupo = (nome_grupo,2)
     
-    
+    #verifica se o grupo existe
     for i in grupos:  
         
         if (nome_novo_grupo in i): 
             con.send('grupo já existe') 
             return
-        
+    
+    #se não existir cria o grupo     
     novo_grupo = []
     novo_grupo.append(nome_novo_grupo) 
     novo_grupo.append((nick,1))  
@@ -97,9 +98,11 @@ def criarGrupo(con,nome_grupo, nick):
     
     return 
 
+#lista os grupos 
 def listarGrupos(con): 
     lista = [] 
     
+    #coloca cada grupo existente em uma lista
     for i in grupos: 
         
         for j in i: 
@@ -110,7 +113,7 @@ def listarGrupos(con):
             else: 
                 continue
         
-    
+    #imprime a lista
     con.send(str(lista)) 
     return
 
