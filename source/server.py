@@ -19,27 +19,36 @@ tcp.bind(orig)
 #lista de grupos 
 grupos = [] 
 
+
+#função que verifica se o user já está em algum grupo
 def jaEstaEmgrupo(nick): 
-    
+    #para caad grupo na lista global de grupos 
     for i in grupos: 
+        #para cada registro de um grupo 
         for j in i: 
+            #se há o registro do usuário no grupo retorna true
             if ((j[1] == 0 or j[1] == 1) and j[0] == nick ): 
                 return True 
     return False
 
+
+#função para juntarse ao grupo 
 def juntarSeAGrupo(con,nome_grupo, nick):  
+    #verifica se usuário já tem grupo
     tchuco = jaEstaEmgrupo(nick)
     if(tchuco): 
         con.send('não pode estar em dois grupos diferentes') 
         return 
+    #se não tem grupo 
     else:
+        #procura o grupo e entra nele
         for i in grupos: 
             for j in i: 
                 if (j[1] == 2 and j[0] == nome_grupo): 
                     i.append((nick,0))
                     con.send('incluido no grupo') 
                     return
-    
+    #se não avisa ao cliente que o grupo não existe
     con.send('grupo não encontrado') 
     return
 
@@ -48,23 +57,27 @@ def solicita(con, msg):
     con.send(msg) 
     return con.recv(1024)
 
+#envia a Message Of The Day
 def enviaMotd(con): 
     #carrega a Message of the day
     motd = open('../file/MOTD.txt','r')
-    
+    line = ''
     for line in motd: 
-        print line
-        con.send(line) 
+        line += line
     
+    line += '\n'    
+    con.send(line) 
     motd.close()
     return 
 
+#cria um grupo
 def criarGrupo(con,nome_grupo, nick): 
     #legenda dos códigos
     #2 é nome do grupo  
     #1 é admin 
     #0 é usuário normal 
     
+    #tupla de identificação do grupo
     nome_novo_grupo = (nome_grupo,2)
     
     
