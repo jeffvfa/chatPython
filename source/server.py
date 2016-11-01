@@ -5,7 +5,7 @@ import socket
 import thread
 
 #HOST = '192.168.1.107' # Endereco IP do Servidor - meu pc 
-HOST = '172.17.15.11'  # Endereco IP do Servidor
+HOST = '172.17.35.128'  # Endereco IP do Servidor
 PORT = 12238        # Porta que o Servidor esta
 
 #tupla do destino
@@ -16,9 +16,11 @@ tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 #configura o servidor pra conectar com clientes
 tcp.bind(orig)
 
-#lista de grupos 
+#lista de grupos  
 grupos = [] 
 
+#lista de conexões 
+conexoes = []
 
 #função que verifica se o user já está em algum grupo
 def jaEstaEmgrupo(nick): 
@@ -44,8 +46,8 @@ def juntarSeAGrupo(con,nome_grupo, nick):
         #procura o grupo e entra nele
         for i in grupos: 
             for j in i: 
-                if (j[1] == 2 and j[0] == nome_grupo): 
-                    i.append((nick,0))
+                if (len(j)==2 and j[1] == 2 and j[0] == nome_grupo): 
+                    i.append((nick,0,con))
                     con.send('incluido no grupo') 
                     return
     #se não avisa ao cliente que o grupo não existe
@@ -61,11 +63,11 @@ def solicita(con, msg):
 def enviaMotd(con): 
     #carrega a Message of the day
     motd = open('../file/MOTD.txt','r')
-    line = ''
+    lines = ''
     for line in motd: 
-        line += line
+        lines += line
     
-    line += '\n'    
+    lines += '\n'    
     con.send(line) 
     motd.close()
     return 
@@ -73,6 +75,7 @@ def enviaMotd(con):
 #cria um grupo
 def criarGrupo(con,nome_grupo, nick): 
     #legenda dos códigos
+    #3 é banido
     #2 é nome do grupo  
     #1 é admin 
     #0 é usuário normal 
@@ -90,7 +93,7 @@ def criarGrupo(con,nome_grupo, nick):
     #se não existir cria o grupo     
     novo_grupo = []
     novo_grupo.append(nome_novo_grupo) 
-    novo_grupo.append((nick,1))  
+    novo_grupo.append((nick,1,con))  
     
     grupos.append(novo_grupo)
     
@@ -107,7 +110,7 @@ def listarGrupos(con):
         
         for j in i: 
              
-            if (j[1] == 2): 
+            if (j[1] == 2 and len(j)==2): 
                 lista.append(j[0]) 
                 break
             else: 
@@ -191,7 +194,11 @@ def parser(mensagem, con, cliente, nick):
         print 'comando /get_file'
         return
     else:
-        print "nenhum comando"
+        print "nenhum comando" 
+        if(jaEstaEmgrupo(nick)): 
+            return  
+        con.send('você precisa fazer parte de um grupo para mandar mensagem!') 
+        return
         
 
 def fecharConexao(con, cliente): 
@@ -201,7 +208,9 @@ def fecharConexao(con, cliente):
 
 
 def conectado(con, cliente):
-    print 'Conectado por', cliente
+    print 'Conectado por', cliente 
+    
+    conexoes.append((cliente,con))
     
     nick = buscaNick(cliente,con)
     
@@ -214,7 +223,7 @@ def conectado(con, cliente):
         if msg != '':
             print nick, cliente, msg
             parser(msg, con , cliente, nick)
-            con.send(msg.upper())
+            
         
     
 

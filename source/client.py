@@ -5,7 +5,7 @@ import thread
 
 
 #HOST = '192.168.1.107'      # Endereco IP do Servidor
-HOST = '172.17.15.11'
+HOST = '172.17.35.128'
 PORT = 12238        # Porta que o Servidor esta
 
 #cria o socket
