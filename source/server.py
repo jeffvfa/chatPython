@@ -50,20 +50,35 @@ def juntarSeAGrupo(con,nome_grupo, nick):
                     i.append((nick,0,con))
                     con.send('incluido no grupo')  
                     msg = nick + ' juntou-se ao grupo' 
-                    mensagemAoGrupo(msg, con, nick)
+                    enviaMensagem(msg, con, nick)
                     return
     #se não avisa ao cliente que o grupo não existe
     con.send('grupo não encontrado') 
     return
 
-def mensagemAoGrupo(msg, con, nick): 
-    for i in grupos:
-        if(((nick,0,con) in i) or ((nick,1,con) in i)):
-            for j in i: 
-                if(j[1] > 1): 
-                    continue 
-                j[2].send(msg) 
-            return
+def enviaMensagem(msg, con, nick, nick_dest = None): 
+    if (nick_dest == None):
+          for i in grupos:
+              if(((nick,0,con) in i) or ((nick,1,con) in i)):
+                  for j in i: 
+                      if(j[1] > 1): 
+                          continue 
+                      j[2].send(msg) 
+                  return 
+    else: 
+          for i in grupos:
+              if(((nick,0,con) in i) or ((nick,1,con) in i)):
+                  for j in i: 
+                      if(j[1] > 1): 
+                          continue 
+                      elif(j[0] == nick_dest):
+                          msg = "*MENSAGEM PRIVADA* " + msg 
+                          con.send(msg)
+                          j[2].send(msg) 
+                          return 
+                  msg = nick_dest + " não faz parte do seu grupo"
+                  con.send(msg) 
+                  return
 
 #envia a Message Of The Day
 def enviaMotd(con): 
@@ -108,23 +123,32 @@ def criarGrupo(con,nome_grupo, nick):
     return 
 
 #lista os grupos 
-def listarGrupos(con): 
+def listar(con, nick): 
     lista = [] 
     
-    #coloca cada grupo existente em uma lista
-    for i in grupos: 
+    if (jaEstaEmgrupo(nick)): 
+        for i in grupos:
+              if(((nick,0,con) in i) or ((nick,1,con) in i)):
+                  for j in i: 
+                      if((len(j)>2) and j[1]!=3): 
+                          lista.append(j[0])
+        con.send(str(lista))
+        return 
+    else:
+        #coloca cada grupo existente em uma lista
+        for i in grupos: 
         
-        for j in i: 
+            for j in i: 
              
-            if (j[1] == 2 and len(j)==2): 
-                lista.append(j[0]) 
-                break
-            else: 
-                continue
+                if (j[1] == 2 and len(j)==2): 
+                    lista.append(j[0]) 
+                    break
+                else: 
+                    continue
         
-    #imprime a lista
-    con.send(str(lista)) 
-    return
+        #imprime a lista
+        con.send(str(lista))
+        return
 
 def parser(mensagem, con, cliente, nick):
     msg = mensagem
@@ -149,7 +173,7 @@ def parser(mensagem, con, cliente, nick):
         return
 
     elif mensagem[0] == '/list':
-        listarGrupos(con)
+        listar(con, nick)
         print 'comando /list'
         return
 
@@ -172,7 +196,9 @@ def parser(mensagem, con, cliente, nick):
         return
 
     elif mensagem[0] == '/msg':
-        print 'comando /msg'
+        mensagem = mensagem[1].split(' ', 1)  
+        msg = nick + ': ' + mensagem[1] 
+        enviaMensagem(msg, con, nick, mensagem[0])
         return
 
     elif mensagem[0] == '/ban':
@@ -203,7 +229,7 @@ def parser(mensagem, con, cliente, nick):
         print "nenhum comando" 
         if(jaEstaEmgrupo(nick)): 
             msg = nick + ': ' + msg 
-            mensagemAoGrupo(msg, con, nick)
+            enviaMensagem(msg, con, nick)
             return  
         con.send('você precisa fazer parte de um grupo para mandar mensagem!') 
         return
