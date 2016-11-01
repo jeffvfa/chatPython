@@ -55,9 +55,11 @@ def juntarSeAGrupo(con,nome_grupo, nick):
     #se não avisa ao cliente que o grupo não existe
     con.send('grupo não encontrado') 
     return
-
+#função para enviar mensagem
 def enviaMensagem(msg, con, nick, nick_dest = None): 
+    #verifica se a mensagem é pessoal
     if (nick_dest == None):
+          #se não for envia para todos
           for i in grupos:
               if(((nick,0,con) in i) or ((nick,1,con) in i)):
                   for j in i: 
@@ -65,6 +67,7 @@ def enviaMensagem(msg, con, nick, nick_dest = None):
                           continue 
                       j[2].send(msg) 
                   return 
+    #se for
     else: 
           for i in grupos:
               if(((nick,0,con) in i) or ((nick,1,con) in i)):
@@ -74,8 +77,10 @@ def enviaMensagem(msg, con, nick, nick_dest = None):
                       elif(j[0] == nick_dest):
                           msg = "*MENSAGEM PRIVADA* " + msg 
                           con.send(msg)
+                          #envia para usuário específico
                           j[2].send(msg) 
                           return 
+                  # se o usuário não está no grupo avisa 
                   msg = nick_dest + " não faz parte do seu grupo"
                   con.send(msg) 
                   return
@@ -226,11 +231,14 @@ def parser(mensagem, con, cliente, nick):
         print 'comando /get_file'
         return
     else:
-        print "nenhum comando" 
+        #se não for nenhum comando assume-se que é uma mensagem
+        #verifica se o usuário está em algum grupo
         if(jaEstaEmgrupo(nick)): 
+            #se está envia mensagem ao grupo
             msg = nick + ': ' + msg 
             enviaMensagem(msg, con, nick)
             return  
+        #se não avisa que precisa fazer parte de um grupo para enviar mensagem
         con.send('você precisa fazer parte de um grupo para mandar mensagem!') 
         return
         
@@ -264,10 +272,14 @@ def conectado(con, cliente):
     fecharConexao(con, cliente)
     thread.exit()
 
+#busca o nick do cliente na base de dados
 def buscaNick(cliente,con): 
+    #enquanto o usuário não tem um nick 
     while 1:
+        #abre a base de dados
         base = open('../file/users.txt','r') 
         database = ''
+        #busca pelo nick
         for line in base:
             database = line.split('%') 
     
@@ -277,42 +289,50 @@ def buscaNick(cliente,con):
             
             if verifica[0] == str(cliente): 
                 return verifica[1] 
+        #se o nick não existe obriga o cliente a criar um nick
         criarNick(cliente,con)
             
-
+#função onde o servidor pergunta ao cliente e recebe a resposta
 def solicita(con,msg): 
     con.send(msg) 
     ret = con.recv(1024) 
     return ret
-
+#cria o nickname
 def criarNick(cliente,con): 
+    #abre a abase de dados
     database = open('../file/users.txt','a') 
+    #pede o nick para o cliente
     nick = solicita(con,'informe o seu nick:') 
+    #coloca o nick no formato da base de dados 
     registro = str(cliente)+'='+str(nick)+'%'  
-
+    
+    #persiste os dados e fecha a base de dados
     database.write(registro)  
     database.close() 
     
     return
-
+#atualiza o nick
 def atualizaNick(cliente, nick, novo_nick): 
     database = open('../file/users.txt','r') 
+    #coloca os dados do antigo registro no formato da base
     antigo = str(cliente)+'='+str(nick)+'%'
+    #coloca os dados do novo registro no formato da base
     novo = registro = str(cliente)+'='+str(novo_nick)+'%'
     
     database_novo = ''
     
-    for line in database:
+    for line in database: 
+        #faz o replace do registro
         database_novo = str(line).replace(antigo,novo)
     
     database.close() 
     
+    #abre a base para escrita e persiste
     database = open('../file/users.txt','w') 
     database.write(database_novo)
     database.close() 
 
     return
-
 
 
 #funçãao main
