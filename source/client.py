@@ -6,7 +6,7 @@ import thread
 
 #HOST = '192.168.1.107'      # Endereco IP do Servidor
 HOST = '172.17.35.128'
-PORT = 12238        # Porta que o Servidor esta
+PORT = 12248        # Porta que o Servidor esta
 
 #cria o socket
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

@@ -6,7 +6,7 @@ import thread
 
 #HOST = '192.168.1.107' # Endereco IP do Servidor - meu pc 
 HOST = '172.17.35.128'  # Endereco IP do Servidor
-PORT = 12238        # Porta que o Servidor esta
+PORT = 12248        # Porta que o Servidor esta
 
 #tupla do destino
 orig = (HOST, PORT) 
@@ -48,16 +48,22 @@ def juntarSeAGrupo(con,nome_grupo, nick):
             for j in i: 
                 if (len(j)==2 and j[1] == 2 and j[0] == nome_grupo): 
                     i.append((nick,0,con))
-                    con.send('incluido no grupo') 
+                    con.send('incluido no grupo')  
+                    msg = nick + ' juntou-se ao grupo' 
+                    mensagemAoGrupo(msg, con, nick)
                     return
     #se não avisa ao cliente que o grupo não existe
     con.send('grupo não encontrado') 
     return
 
-
-def solicita(con, msg): 
-    con.send(msg) 
-    return con.recv(1024)
+def mensagemAoGrupo(msg, con, nick): 
+    for i in grupos:
+        if(((nick,0,con) in i) or ((nick,1,con) in i)):
+            for j in i: 
+                if(j[1] > 1): 
+                    continue 
+                j[2].send(msg) 
+            return
 
 #envia a Message Of The Day
 def enviaMotd(con): 
@@ -196,6 +202,8 @@ def parser(mensagem, con, cliente, nick):
     else:
         print "nenhum comando" 
         if(jaEstaEmgrupo(nick)): 
+            msg = nick + ': ' + msg 
+            mensagemAoGrupo(msg, con, nick)
             return  
         con.send('você precisa fazer parte de um grupo para mandar mensagem!') 
         return
@@ -245,6 +253,11 @@ def buscaNick(cliente,con):
                 return verifica[1] 
         criarNick(cliente,con)
             
+
+def solicita(con,msg): 
+    con.send(msg) 
+    ret = con.recv(1024) 
+    return ret
 
 def criarNick(cliente,con): 
     database = open('../file/users.txt','a') 
