@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import socket 
-import thread
+import thread 
+import os
 
 
 #HOST = '192.168.1.107'      # Endereco IP do Servidor
-HOST = '172.17.35.128'
-PORT = 12248        # Porta que o Servidor esta
+HOST = '172.17.58.193'
+PORT = 12208        # Porta que o Servidor esta
 
 #cria o socket
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -30,6 +31,9 @@ while 1:
     #se o usuário quiser sair sai
     if msg == '/quit':
        tcp.close()
-       break
+       break 
+    elif msg == '/clear': 
+        os.system('cls' if os.name == 'nt' else 'clear')
+        
     #envia a mensagem
     tcp.send (msg)

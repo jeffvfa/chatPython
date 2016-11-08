@@ -5,8 +5,8 @@ import socket
 import thread
 
 #HOST = '192.168.1.107' # Endereco IP do Servidor - meu pc 
-HOST = '172.17.35.128'  # Endereco IP do Servidor
-PORT = 12248        # Porta que o Servidor esta
+HOST = '172.17.58.193'  # Endereco IP do Servidor
+PORT = 12208        # Porta que o Servidor esta
 
 #tupla do destino
 orig = (HOST, PORT) 
@@ -33,7 +33,35 @@ def jaEstaEmgrupo(nick):
                 return True 
     return False
 
-
+#função para deixar o grupo 
+def deixarGrupo(con, nick):  
+    #verifica se usuário já tem grupo
+    tchuco = jaEstaEmgrupo(nick)
+    if(tchuco): 
+        #procura o grupo e entra nele
+        for i in grupos: 
+            if ((nick,0,con) in i): 
+                msg = nick + ' saiu do grupo' 
+                enviaMensagem(msg, con, nick)
+                
+                i.remove((nick,0,con))
+                
+                
+                return 
+            if ((nick,1,con) in i): 
+                msg = 'administrador '+ nick + ' saiu do grupo' 
+                enviaMensagem(msg, con, nick)
+                
+                i.remove((nick,1,con))
+                 
+                
+                return 
+        
+    #se não tem grupo 
+    else:
+        con.send('não tá em grupo') 
+        return
+    
 #função para juntarse ao grupo 
 def juntarSeAGrupo(con,nome_grupo, nick):  
     #verifica se usuário já tem grupo
@@ -48,13 +76,14 @@ def juntarSeAGrupo(con,nome_grupo, nick):
             for j in i: 
                 if (len(j)==2 and j[1] == 2 and j[0] == nome_grupo): 
                     i.append((nick,0,con))
-                    con.send('incluido no grupo')  
+                     
                     msg = nick + ' juntou-se ao grupo' 
                     enviaMensagem(msg, con, nick)
                     return
     #se não avisa ao cliente que o grupo não existe
     con.send('grupo não encontrado') 
     return
+
 #função para enviar mensagem
 def enviaMensagem(msg, con, nick, nick_dest = None): 
     #verifica se a mensagem é pessoal
@@ -175,6 +204,7 @@ def parser(mensagem, con, cliente, nick):
 
     elif mensagem[0] == '/leave':
         print 'comando /leave'
+        deixarGrupo(con, nick)
         return
 
     elif mensagem[0] == '/list':
