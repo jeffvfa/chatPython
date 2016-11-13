@@ -22,6 +22,28 @@ grupos = []
 #lista de conexões
 conexoes = []
 
+#lista de insdisponíveis
+indisponiveis = []
+
+def ausente(con,nick):
+    if(jaEstaEmgrupo(nick)):
+        indisponiveis.append(con)
+        msg = nick + ' está ausente'
+        enviaMensagemAway(msg, con, nick)
+
+    else:
+        con.send('você precisa estar em um grupo')
+    return
+
+def enviaMensagemAway(msg, con, nick):
+    for i in grupos:
+        if(((nick,0,con) in i) or ((nick,1,con) in i)):
+            for j in i:
+                if(j[1] > 1 or (j[2] in indisponiveis)):
+                    continue
+                j[2].send(msg)
+            return
+
 #função que verifica se o user já está em algum grupo
 def jaEstaEmgrupo(nick):
     #para caad grupo na lista global de grupos
@@ -131,13 +153,17 @@ def juntarSeAGrupo(con,nome_grupo, nick):
 
 #função para enviar mensagem
 def enviaMensagem(msg, con, nick, nick_dest = None):
+    #se o usuário estava ausente sai da lista
+    if(con in indisponiveis):
+        indisponiveis.remove(con)
+
     #verifica se a mensagem é pessoal
     if (nick_dest == None):
           #se não for envia para todos
           for i in grupos:
               if(((nick,0,con) in i) or ((nick,1,con) in i)):
                   for j in i:
-                      if(j[1] > 1):
+                      if(j[1] > 1 or (j[2] in indisponiveis)):
                           continue
                       j[2].send(msg)
                   return
@@ -148,12 +174,17 @@ def enviaMensagem(msg, con, nick, nick_dest = None):
                   for j in i:
                       if(j[1] > 1):
                           continue
+
                       elif(j[0] == nick_dest):
-                          msg = "*MENSAGEM PRIVADA* " + msg
-                          con.send(msg)
-                          #envia para usuário específico
-                          j[2].send(msg)
-                          return
+                          if(j[2] in indisponiveis):
+                              con.send('usuário está ausente')
+                              return
+                          else:
+                              msg = "*MENSAGEM PRIVADA* " + msg
+                              con.send(msg)
+                              #envia para usuário específico
+                              j[2].send(msg)
+                              return
                   # se o usuário não está no grupo avisa
                   msg = nick_dest + " não faz parte do seu grupo"
                   con.send(msg)
@@ -175,7 +206,6 @@ def enviaMotd(con):
 #cria um grupo
 def criarGrupo(con,nome_grupo, nick):
     #legenda dos códigos
-    #4 é away
     #3 é banido
     #2 é nome do grupo
     #1 é admin
@@ -275,6 +305,9 @@ def parser(mensagem, con, cliente, nick):
 
     elif mensagem[0] == '/away':
         print 'comando /away'
+        print grupos
+        print indisponiveis
+        ausente(con,nick)
         return
 
     elif mensagem[0] == '/msg':
