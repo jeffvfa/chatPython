@@ -330,6 +330,7 @@ def parser(mensagem, con, cliente, nick):
 
     elif mensagem[0] == '/get_file':
         print 'comando /get_file'
+        mandarArquivo(con,mensagem[1],nick)
         return
     else:
         #se não for nenhum comando assume-se que é uma mensagem
@@ -496,6 +497,30 @@ def listarArquivos(con, nick):
                         lista.append(j[0])
         con.send(str(lista))
         return
+    else:
+        con.send('você precisa fazer parte de um grupo!')
+        return
+
+def mandarArquivo(con,nome_arquivo,nick):
+    if(jaEstaEmgrupo(nick)):
+        for i in grupos:
+            if(((nick,0,con) in i) or ((nick,1,con) in i)):
+                for j in i:
+                    if j == (nome_arquivo,4):
+                        caminho = '../file/files/'+nome_arquivo
+                        arq = open(caminho, 'rb')
+
+                        for i in arq.read():
+                            print i
+                            con.send(i)
+
+                        arq.close()
+                        con.send('Mc Livinho')
+                        return
+
+            con.send('arquivo non ecxist')
+            return
+
     else:
         con.send('você precisa fazer parte de um grupo!')
         return

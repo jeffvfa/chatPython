@@ -49,6 +49,31 @@ while 1:
         arq.close()
         tcp.send('Mc Livinho')
 
+    elif mensagem[0] == '/get_file':
+        tcp.send (msg)
+
+        caminho = '../file/'+mensagem[1]
+
+        arq = open(caminho, 'wb')
+
+        dados = tcp.recv(1024)
+
+        while dados:
+            print dados
+            print dados
+
+            arq.write(dados)
+
+            print 'iterou'
+            if ('Mc Livinho' in dados):
+                print 'brecou'
+                break
+
+            dados = tcp.recv(1024)
+
+
+        arq.close()
+
     #envia a mensagem
     else:
         tcp.send (msg)
