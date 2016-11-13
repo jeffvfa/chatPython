@@ -4,9 +4,9 @@
 import socket
 import thread
 
-HOST = '192.168.1.107' # Endereco IP do Servidor - meu pc
+HOST = '192.168.0.13' # Endereco IP do Servidor - meu pc
 #HOST = '172.17.58.193'  # Endereco IP do Servidor
-PORT = 12501        # Porta que o Servidor esta
+PORT = 12019        # Porta que o Servidor esta
 
 #tupla do destino
 orig = (HOST, PORT)
@@ -25,6 +25,9 @@ conexoes = []
 #lista de insdisponíveis
 indisponiveis = []
 
+#lista de arquivos
+arquivos = []
+
 def ausente(con,nick):
     if(jaEstaEmgrupo(nick)):
         indisponiveis.append(con)
@@ -34,15 +37,6 @@ def ausente(con,nick):
     else:
         con.send('você precisa estar em um grupo')
     return
-
-def enviaMensagemAway(msg, con, nick):
-    for i in grupos:
-        if(((nick,0,con) in i) or ((nick,1,con) in i)):
-            for j in i:
-                if(j[1] > 1 or (j[2] in indisponiveis)):
-                    continue
-                j[2].send(msg)
-            return
 
 #função que verifica se o user já está em algum grupo
 def jaEstaEmgrupo(nick):
@@ -206,6 +200,7 @@ def enviaMotd(con):
 #cria um grupo
 def criarGrupo(con,nome_grupo, nick):
     #legenda dos códigos
+    #4 é arquivo
     #3 é banido
     #2 é nome do grupo
     #1 é admin
@@ -300,7 +295,6 @@ def parser(mensagem, con, cliente, nick):
 
     elif mensagem[0] == '/delete':
         print 'comando /delete'
-        deletarGrupo(con, cliente, mensagem[1])
         return
 
     elif mensagem[0] == '/away':
@@ -326,12 +320,9 @@ def parser(mensagem, con, cliente, nick):
         kickar(con, nick, mensagem[1])
         return
 
-    elif mensagem[0] == '/clear':
-        print 'comando /clear'
-        return
-
     elif mensagem[0] == '/file':
         print 'comando /file'
+        receberArquivo(con,mensagem[1],nick)
         return
 
 
@@ -462,6 +453,39 @@ def atualizaNick(cliente, nick, novo_nick):
 
     return
 
+def receberArquivo(con,nome_arquivo,nick):
+    if(jaEstaEmgrupo(nick)):
+        nome_arquivo = nome_arquivo.split('/')
+        nome_arq = nome_arquivo[(len(nome_arquivo)-1)]
+
+        for i in grupos:
+            if(((nick,0,con) in i) or ((nick,1,con) in i)):
+                i.append((nome_arq,4))
+
+        caminho = '../file/files/'+nome_arq
+
+        arq = open(caminho, 'wb')
+
+        dados = con.recv(1024)
+        while dados:
+
+            print dados
+
+            arq.write(dados)
+
+            print 'iterou'
+            if ('Mc Livinho' in dados):
+                break
+
+            dados = con.recv(1024)
+
+
+        arq.close()
+        con.send('enviado com sucesso!')
+        return
+
+    else:
+        con.send('você precisa fazer parte de um grupo!')
 
 #funçãao main
 def main():

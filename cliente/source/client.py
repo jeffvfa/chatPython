@@ -5,9 +5,9 @@ import thread
 import os
 
 
-HOST = '192.168.1.107'      # Endereco IP do Servidor
+HOST = '192.168.0.13'      # Endereco IP do Servidor
 #HOST = '172.17.58.193'
-PORT = 12501       # Porta que o Servidor esta
+PORT = 12019       # Porta que o Servidor esta
 
 #cria o socket
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -28,12 +28,27 @@ while 1:
     #pega a mensagem do usuário
     msg = raw_input()
 
+    mensagem = msg.split(' ', 1)
     #se o usuário quiser sair sai
-    if msg == '/quit':
+    if mensagem[0] == '/quit':
        tcp.close()
        break
-    elif msg == '/clear':
+    #se quiser limpar limpa
+    elif mensagem[0] == '/clear':
         os.system('cls' if os.name == 'nt' else 'clear')
 
+    #se quiser mandar arquivo
+    elif mensagem[0] == '/file':
+        tcp.send (msg)
+
+        arq = open(mensagem[1], 'rb')
+
+        for i in arq.read():
+            tcp.send(i)
+
+        arq.close()
+        tcp.send('Mc Livinho')
+
     #envia a mensagem
-    tcp.send (msg)
+    else:
+        tcp.send (msg)
