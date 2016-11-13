@@ -6,7 +6,7 @@ import thread
 
 HOST = '192.168.0.13' # Endereco IP do Servidor - meu pc
 #HOST = '172.17.58.193'  # Endereco IP do Servidor
-PORT = 12019        # Porta que o Servidor esta
+PORT = 12119        # Porta que o Servidor esta
 
 #tupla do destino
 orig = (HOST, PORT)
@@ -24,9 +24,6 @@ conexoes = []
 
 #lista de insdisponíveis
 indisponiveis = []
-
-#lista de arquivos
-arquivos = []
 
 def ausente(con,nick):
     if(jaEstaEmgrupo(nick)):
@@ -328,6 +325,7 @@ def parser(mensagem, con, cliente, nick):
 
     elif mensagem[0] == '/list_files':
         print 'comando /list_files'
+        listarArquivos(con, nick)
         return
 
     elif mensagem[0] == '/get_file':
@@ -486,6 +484,21 @@ def receberArquivo(con,nome_arquivo,nick):
 
     else:
         con.send('você precisa fazer parte de um grupo!')
+        return
+
+def listarArquivos(con, nick):
+    if(jaEstaEmgrupo(nick)):
+        lista = []
+        for i in grupos:
+            if(((nick,0,con) in i) or ((nick,1,con) in i)):
+                for j in i:
+                    if j[1] == 4:
+                        lista.append(j[0])
+        con.send(str(lista))
+        return
+    else:
+        con.send('você precisa fazer parte de um grupo!')
+        return
 
 #funçãao main
 def main():

@@ -7,7 +7,7 @@ import os
 
 HOST = '192.168.0.13'      # Endereco IP do Servidor
 #HOST = '172.17.58.193'
-PORT = 12019       # Porta que o Servidor esta
+PORT = 12119       # Porta que o Servidor esta
 
 #cria o socket
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
