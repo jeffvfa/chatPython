@@ -4,9 +4,9 @@
 import socket
 import thread
 
-HOST = '192.168.0.13' # Endereco IP do Servidor - meu pc
+HOST = '172.31.219.91' # Endereco IP do Servidor - meu pc
 #HOST = '172.17.58.193'  # Endereco IP do Servidor
-PORT = 12119        # Porta que o Servidor esta
+PORT = 12018        # Porta que o Servidor esta
 
 #tupla do destino
 orig = (HOST, PORT)
@@ -27,9 +27,9 @@ indisponiveis = []
 
 def ausente(con,nick):
     if(jaEstaEmgrupo(nick)):
-        indisponiveis.append(con)
         msg = nick + ' está ausente'
         enviaMensagemAway(msg, con, nick)
+        indisponiveis.append(con)
 
     else:
         con.send('você precisa estar em um grupo')
@@ -141,6 +141,19 @@ def juntarSeAGrupo(con,nome_grupo, nick):
     #se não avisa ao cliente que o grupo não existe
     con.send('grupo não encontrado')
     return
+
+def enviaMensagemAway(msg, con, nick):
+    print 'tá no envia away'
+    for i in grupos:
+        print 'tá em grupo'
+        if(((nick,0,con) in i) or ((nick,1,con) in i)):
+            for j in i:
+                print 'tá em grupo'
+                if(j[1] > 1 or (j[2] in indisponiveis)):
+                    continue
+                print 'tá em grupo'
+                j[2].send(msg)
+            return
 
 #função para enviar mensagem
 def enviaMensagem(msg, con, nick, nick_dest = None):
@@ -261,13 +274,11 @@ def parser(mensagem, con, cliente, nick):
         return
 
     elif mensagem[0] == '/help':
-        print "HELP ME PLIX"
         enviaMotd(con)
         return
 
     elif mensagem[0] == '/nick':
         novo_nick = str(mensagem[1]).strip()
-        atualizaNick(cliente, nick, novo_nick)
         return
 
     elif mensagem[0] == '/leave':
@@ -503,6 +514,7 @@ def listarArquivos(con, nick):
 
 def mandarArquivo(con,nome_arquivo,nick):
     if(jaEstaEmgrupo(nick)):
+
         for i in grupos:
             if(((nick,0,con) in i) or ((nick,1,con) in i)):
                 for j in i:
