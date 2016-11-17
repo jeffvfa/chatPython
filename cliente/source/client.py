@@ -5,9 +5,9 @@ import thread
 import os
 
 
-HOST = '172.31.219.91'      # Endereco IP do Servidor
+HOST = '192.168.0.13'      # Endereco IP do Servidor
 #HOST = '172.17.58.193'
-PORT = 12018       # Porta que o Servidor esta
+PORT = 12111       # Porta que o Servidor esta
 
 #cria o socket
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -21,8 +21,8 @@ def receber (a,c):
         #recebe a resposta do Servidor
         recebido = tcp.recv(1024)
         print recebido
-
 while 1:
+
     thread.start_new_thread(receber, ('',''))
 
     #pega a mensagem do usuário
@@ -49,30 +49,26 @@ while 1:
         arq.close()
         tcp.send('Mc Livinho')
 
+    #se quiser receber
     elif mensagem[0] == '/get_file':
         tcp.send (msg)
 
         caminho = '../file/'+mensagem[1]
 
-        arq = open(caminho, 'wb')
+        arqo = open(caminho, 'wb')
 
-        dados = tcp.recv(1024)
-
-        while dados:
-            print dados
+        while 1:
+            dados = tcp.recv(1024)
             print dados
 
-            arq.write(dados)
-
-            print 'iterou'
             if ('Mc Livinho' in dados):
                 print 'brecou'
                 break
 
-            dados = tcp.recv(1024)
+            arqo.write(dados)
 
 
-        arq.close()
+        arqo.close()
 
     #envia a mensagem
     else:

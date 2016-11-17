@@ -4,9 +4,9 @@
 import socket
 import thread
 
-HOST = '172.31.219.91' # Endereco IP do Servidor - meu pc
+HOST = '192.168.0.13' # Endereco IP do Servidor - meu pc
 #HOST = '172.17.58.193'  # Endereco IP do Servidor
-PORT = 12018        # Porta que o Servidor esta
+PORT = 12111        # Porta que o Servidor esta
 
 #tupla do destino
 orig = (HOST, PORT)
@@ -522,12 +522,12 @@ def mandarArquivo(con,nome_arquivo,nick):
                         caminho = '../file/files/'+nome_arquivo
                         arq = open(caminho, 'rb')
 
-                        for i in arq.read():
-                            print i
+                        for i in arq.readlines():
                             con.send(i)
 
                         arq.close()
                         con.send('Mc Livinho')
+                        con.send('recebido com sucesso!')
                         return
 
             con.send('arquivo non ecxist')
