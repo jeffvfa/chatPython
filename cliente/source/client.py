@@ -1,3 +1,7 @@
+"""@package modulo do cliente
+@author jeffvfa
+"""
+
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import socket
@@ -47,6 +51,7 @@ while 1:
             tcp.send(i)
 
         arq.close()
+        #servidor reconhece isso como um break
         tcp.send('Mc Livinho')
 
     #se quiser receber

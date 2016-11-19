@@ -1,12 +1,15 @@
+## @package server.py
+#  Documentação do módulo
+#  @author jeffvfa
+
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import socket
 import thread
 
-HOST = '192.168.0.13' # Endereco IP do Servidor - meu pc
-#HOST = '172.17.58.193'  # Endereco IP do Servidor
-PORT = 12111        # Porta que o Servidor esta
+HOST = '192.168.0.13' #Endereco IP do Servidor - meu pc"""
+PORT = 12111        #Porta que o Servidor esta
 
 #tupla do destino
 orig = (HOST, PORT)
@@ -34,7 +37,7 @@ def ausente(con,nick):
     else:
         con.send('você precisa estar em um grupo')
     return
-
+##
 #função que verifica se o user já está em algum grupo
 def jaEstaEmgrupo(nick):
     #para caad grupo na lista global de grupos
@@ -45,7 +48,7 @@ def jaEstaEmgrupo(nick):
             if ((j[1] == 0 or j[1] == 1) and j[0] == nick ):
                 return True
     return False
-
+##
 #função que kicka o usuário do grupo
 def kickar(con, nick, nick_kick):
     for i in grupos:
@@ -84,7 +87,7 @@ def banir(con, nick, nick_ban):
         elif((nick,0,con) in i):
             con.send('você precisa ser administrador para executar esse comando')
             return
-
+##
 #função para deixar o grupo
 def deixarGrupo(con, nick):
     #verifica se usuário já tem grupo
@@ -113,7 +116,7 @@ def deixarGrupo(con, nick):
     else:
         con.send('não tá em grupo')
         return
-
+##
 #função para juntarse ao grupo
 def juntarSeAGrupo(con,nome_grupo, nick):
     #verifica se usuário já tem grupo
@@ -154,7 +157,7 @@ def enviaMensagemAway(msg, con, nick):
                 print 'tá em grupo'
                 j[2].send(msg)
             return
-
+##
 #função para enviar mensagem
 def enviaMensagem(msg, con, nick, nick_dest = None):
     #se o usuário estava ausente sai da lista
